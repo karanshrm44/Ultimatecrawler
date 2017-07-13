@@ -22,12 +22,13 @@ router.get('/scrap',function(req,res)
         if(response.statusCode===200)
         {
             var $=cheerio.load(body);
+            linkCollection($);
             var m='of';
             var isWordFound=searchForWord($,m);
             if(isWordFound)
             {
                 console.log(isWordFound);
-                console.log("word " + m + "is found at " + url);
+                res.send("word " + m + " is found at " + url);
             }
         }
        
@@ -38,6 +39,36 @@ router.get('/scrap',function(req,res)
         return(bodytext.toLowerCase().indexOf(word.toLowerCase())!==-1);
         
        
+    }
+
+    function linkCollection($)
+    {   //Declaration of array to store all Relative Links
+        var  allrelativelinks=[];
+        // Declaration of array to store all absolute Links
+        var allabsolutelinks=[];
+
+        //Select all <a> elements with a href attribute that starts with "/"
+        var relativeLinks=$("a[href^='/']");
+        //This iterate over each DOM Element
+        relativeLinks.each(function(){
+            allrelativelinks.push($(this).attr('href'));
+        });
+        
+        var absolutelinks=$("a[href^='http']");
+        
+        absolutelinks.each(function()
+        {
+            allabsolutelinks.push($(this).attr('href'));
+        });
+
+        console.log("Found " + allrelativelinks.length + " Relative Links");
+        console.log("Found " + allabsolutelinks.length + " Absolute links");
+        res.send(allrelativelinks);
+       
+
+        
+
+
     }
 
 });
